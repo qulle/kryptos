@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kryptos | Decoded</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #ffffff;
+            padding: 1rem;
+        }
+
+        .zoom {
+            padding: 0 0 1rem 0;
+        }
+
+        .zoom input {
+            width: 300px;
+        }
+
+        .kryptos {
+            display: flex;
+            min-height: 100%;
+            transform-origin: top left;
+        }
+
+        .kryptos__cipher,
+        .kryptos__vigenere {
+            flex: 1;
+        }
+
+        table {
+            border-collapse: collapse;
+            cursor: default;
+            table-layout: fixed;
+            min-width: max-content;
+        }
+
+        table td {
+            width: 24px;
+            height: 24px;
+            border: 1px dashed rgba(49, 65, 122, .5);
+            text-align: center;
+            color: #212529;
+        }
+
+        table tr td:first-child,
+        table tr:first-child {
+            background-color: #edeff8;
+            font-weight: bold;
+        }
+
+        table tr:not(:first-child) td.hover:not(:first-child):hover {
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            color: #ffffff !important;
+        }
+
+        table td.cross {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .k1 { background-color: #fd9694; }
+        .k2 { background-color: #5dd0c4; }
+        .k3 { background-color: #ffe598; }
+        .k4 { background-color: #8db5f9; }
+    </style>
+</head>
+<body>
+    <div class="zoom">
+        <input type="range" id="zoom" name="zoom" min="0" max="200" value="100" />
+    </div>
+    <div class="kryptos" id="kryptos">
+        <div class="kryptos__cipher">
+            <table id="encoded"></table>
+        </div>
+        <div class="kryptos__vigenere">
+            <table id="decoded"></table>
+        </div>
+    </div>
+</body>
+    <script>
+        // -------------------------------------------------------------------------------
+        // Helpers
+        // -------------------------------------------------------------------------------
+        const makeGrid = (grid, table, callback = undefined) => {
+            let longest = 0;
+            grid.forEach((line, index) => {
+                const row = document.createElement('tr');
+                const side = document.createElement('td');
+                side.innerHTML = padZero(index);
+                row.appendChild(side);
+
+                line.split('').forEach((letter, position) => {
+                    const cell = document.createElement('td');
+                    cell.innerHTML = letter;
+                    row.appendChild(cell);
+
+                    callback && callback(cell, index, position);
+                });
+                table.appendChild(row);
+
+                if(line.length > longest) {
+                    longest = line.length;
+                }
+            });
+            
+            makeTopRow(table, longest);
+        }
+
+        const makeTopRow = (table, longest) => {
+            const topRow = document.createElement('tr');
+            for(let i = 0; i < longest; i++) {
+                if(i === 0) {
+                    const cell = document.createElement('td');
+                    cell.innerHTML = '';
+                    topRow.appendChild(cell);
+                }
+
+                const cell = document.createElement('td');
+                cell.innerHTML = padZero(i);
+                topRow.appendChild(cell);
+            }
+            table.prepend(topRow);
+        }
+
+        const padZero = (i) => {
+            return i < 10 ? '0' + i : i;
+        }
+
+        const applyKColors = (cell, index, position) => {
+            if(index <= 1) {
+                cell.classList.add('k1')
+            }
+
+            if(index >= 2 && index <= 13) {
+                cell.classList.add('k2')
+            }
+
+            if(index >= 14 && index <= 24 && (!(index === 24 && position > 26))) {
+                cell.classList.add('k3');
+            }
+
+            if(index >= 24 && index <= 27) {
+                if(index === 24 && position > 26) {
+                    cell.classList.add('k4');
+                }
+
+                if(index >= 25) {
+                    cell.classList.add('k4');
+                }
+            }
+        }
+
+        const applyCrossColor = (table, row, col) => {
+            table.rows[row].querySelectorAll('td').forEach(cell => {
+                cell.classList.add('cross');
+            });
+
+            Array.from(table.rows).forEach(row => {
+                const cell = row.cells[col];
+                if(cell) {
+                    cell.classList.add('cross');
+                }
+            });
+        }
+
+        const removeCrossColor = (table) => {
+            table.querySelectorAll('td.cross').forEach(cell => {
+                cell.classList.remove('cross');
+            });
+        }
+
+        const attachCellHover = (table) => {
+            table.addEventListener('mouseover', (e) => {
+                const td = e.target.closest('td');
+                if(!td || !table.contains(td)) {
+                    return
+                }
+
+                const tr = td.parentElement;
+                const row = tr.rowIndex;
+                const col = td.cellIndex;
+
+                if(row > 0 && col > 0) {
+                    td.classList.add('hover');
+                    applyCrossColor(table, row, col);
+                }
+            });
+
+            table.addEventListener('mouseout', (e) => {
+                const td = e.target.closest('td');
+                if(!td || !table.contains(td)) {
+                    return
+                }
+
+                td.classList.remove('hover');
+                removeCrossColor(table);
+            });
+        }
+
+        // -------------------------------------------------------------------------------
+        // Left side: Cipher Encoded
+        // -------------------------------------------------------------------------------
+        (() => {
+            const table = document.getElementById('encoded');
+            const grid = [
+                'EMUFPHZLRFAXYUSDJKZLDKRNSHGNFIVJ',
+                'YQTQUXQBQVYUVLLTREVJYQTMKYRDMFD',
+                'VFPJUDEEHZWETZYVGWHKKQETGFQJNCE',
+                'GGWHKK?DQMCPFQZDQMMIAGPFXHQRLG',
+                'TIMVMZJANQLVKQEDAGDVFRPJUNGEUNA',
+                'QZGZLECGYUXUEENJTBJLBQCRTBJDFHRR',
+                'YIZETKZEMVDUFKSJHKFWHKUWQLSZFTI',
+                'HHDDDUVH?DWKBFUFPWNTDFIYCUQZERE',
+                'EVLDKFEZMOQQJLTTUGSYQPFEUNLAVIDX',
+                'FLGGTEZ?FKZBSFDQVGOGIPUFXHHDRKF',
+                'FHQNTGPUAECNUVPDJMQCLQUMUNEDFQ',
+                'ELZZVRRGKFFVOEEXBDMVPNFQXEZLGRE',
+                'DNQFMPNZGLFLPMRJQYALMGNUVPDXVKP',
+                'DQUMEBEDMHDAFMJGZNUPLGEWJLLAETG',
+                'ENDYAHROHNLSRHEOCPTEOIBIDYSHNAIA',
+                'CHTNREYULDSLLSLLNOHSNOSMRWXMNE',
+                'TPRNGATIHNRARPESLNNELEBLPIIACAE',
+                'WMTWNDITEENRAHCTENEUDRETNHAEOE',
+                'TFOLSEDTIWENHAEIOYTEYQHEENCTAYCR',
+                'EIFTBRSPAMHHEWENATAMATEGYEERLB',
+                'TEEFOASFIOTUETUAEOTOARMAEERTNRTI',
+                'BSEDDNIAAHTTMSTEWPIEROAGRIEWFEB',
+                'AECTDDHILCEIHSITEGOEAOSDDRYDLORIT',
+                'RKLMLEHAGTDHARDPNEOHMGFMFEUHE',
+                'ECDMRIPFEIMEHNLSSTTRTVDOHW?OBKR',
+                'UOXOGHULBSOLIFBBWFLRVQQPRNGKSSO',
+                'TWTQSJQSSEKZZWATJKLUDIAWINFBNYP',
+                'VTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR'
+            ];
+
+            makeGrid(grid, table, (cell, index, position) => {
+                applyKColors(cell, index, position);
+            });
+            attachCellHover(table);
+        })();
+
+        // -------------------------------------------------------------------------------
+        // Right side: Cipher Decoded
+        // -------------------------------------------------------------------------------
+        (() => {
+            const table = document.getElementById('decoded');
+            const grid = [
+                'BETWEENSUBTLESHADINGANDTHEABSENC',
+                'EOFLIGHTLIESTHENUANCEOFIQLUSION',
+                'ITWASTOTALLYINVISIBLEHOWSTHATPO',
+                'SSIBLE?THEYUSEDTHEEARTHSMAGNET',
+                'ICFIELDXTHEINFORMATIONWASGATHER',
+                'EDANDTRANSMITTEDUNDERGRUUNDTOANU',
+                'NKNOWNLOCATIONXDOESLANGLEYKNOWA',
+                'BOUTTHIS?THEYSHOULDITSBURIEDOUT',
+                'THERESOMEWHEREXWHOKNOWSTHEEXACTL',
+                'OCATION?ONLYWWTHISWASHISLASTMES',
+                'SAGEXTHIRTYEIGHTDEGREESFIFTYSE',
+                'VENMINUTESSIXPOINTFIVESECONDSNO',
+                'RTHSEVENTYSEVENDEGREESEIGHTMINU',
+                'TESFORTYFOURSECONDSWESTIDBYROWS',
+                'SLOWLYDESPARATLYSLOWLYTHEREMAINS',
+                'OFPASSAGEDEBRISTHATENCUMBEREDT',
+                'HELOWERPARTOFTHEDOORWAYWASREMOV',
+                'EDWITHTREMBLINGHANDSIMADEATINY',
+                'BREACHINTHEUPPERLEFTHANDCORNERAN',
+                'DTHENWIDENINGTHEHOLEALITTLEIIN',
+                'SERTEDTHECANDLEANDPEEREDINTHEHOT',
+                'AIRESCAPINGFROMTHECHAMBERCAUSED',
+                'THEFLAMETOFLICKERBUTPRESENTLYDETA',
+                'ILSOFTHEROOMWITHINEMERGEDFROM',
+                'THEMISTXCANYOUSEEANYTHINGQ?....',
+                '.................EASTNORTHEAST.',
+                '............................BER',
+                'LIN............................'
+            ];
+
+            makeGrid(grid, table, (cell, index, position) => {
+                applyKColors(cell, index, position);
+            });
+            attachCellHover(table);
+        })();
+
+        // -------------------------------------------------------------------------------
+        // Zoom Control
+        // -------------------------------------------------------------------------------
+        (() => {
+            const slider = document.getElementById('zoom');
+            const kryptos = document.getElementById('kryptos');
+
+            slider.addEventListener('input', (event) => {
+                const zoom = event.target.value;
+                kryptos.style.scale = zoom / 100;
+                kryptos.style.sca
+            });
+        })();
+    </script>
+</html>
