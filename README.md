@@ -13,6 +13,30 @@ Kryptos is a sculpture by the American artist Jim Sanborn located on the grounds
 ## K1-K4
 The Kryptos sculpture is devided into four different segments with names, K1, K2, K3, and K4. The tree first segments have been solved, but the segment (K4) is still unsolved (2025-12-29).
 
+## K4
+The K4 cipher is a 97-character-long text. Clues to K4 have been given by the creator of the sculpture. Entering the clues into the cipher gives the following results, where '.' represents the target for solving and '-' represents the part of the solved K3.
+- EAST
+- NORTHEAST
+- BERLIN
+- CLOCK
+
+```
+A: ---------------------------OBKR
+B: ---------------------------....
+```
+```
+A: UOXOGHULBSOLIFBBWFLRVQQPRNGKSSO
+B: .................EASTNORTHEAST.
+```
+```
+A: TWTQSJQSSEKZZWATJKLUDIAWINFBNYP
+B: ............................BER
+```
+```
+A: VTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR
+B: LINCLOCK.......................
+```
+
 ## Indept Information
 There is a lot of information online about the artwork and the work that has been devoted to understanding and solving its mysterious puzzles. 
 
