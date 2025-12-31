@@ -20,21 +20,22 @@ The K4 cipher is a 97-character-long text. Clues to K4 have been given by the cr
 - BERLIN
 - CLOCK
 
+A - is the plain text, and B - is the encoded result.
 ```
-A: ---------------------------OBKR
-B: ---------------------------....
-```
-```
-A: UOXOGHULBSOLIFBBWFLRVQQPRNGKSSO
-B: .................EASTNORTHEAST.
+A: ---------------------------....
+B: ---------------------------OBKR
 ```
 ```
-A: TWTQSJQSSEKZZWATJKLUDIAWINFBNYP
-B: ............................BER
+A: .................EASTNORTHEAST.
+B: UOXOGHULBSOLIFBBWFLRVQQPRNGKSSO
 ```
 ```
-A: VTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR
-B: LINCLOCK.......................
+A: ............................BER
+B: TWTQSJQSSEKZZWATJKLUDIAWINFBNYP
+```
+```
+A: LINCLOCK.......................
+B: VTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR
 ```
 
 ## Indept Information
