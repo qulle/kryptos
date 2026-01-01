@@ -13,6 +13,15 @@ Kryptos is a sculpture by the American artist Jim Sanborn located on the grounds
 ## K1-K4
 The Kryptos sculpture is devided into four different segments with names, K1, K2, K3, and K4. The tree first segments have been solved, but the segment (K4) is still unsolved (2025-12-29).
 
+## K1
+The K1 cipher is a 63-character-long text. It was encoded using a Substitution cipher. A Vigenère table was used that was aligned by the word 'KRYPTOS'. The key used to encode the text using the Vigenère table was 'PALIMPSEST.
+
+## K2
+The K2 cipher is a 372-character-long text. It was encoded using a Substitution cipher. A Vigenère table was used that was aligned by the word 'KRYPTOS'. The key used to encode the text using the Vigenère table was 'ABSCISSA.
+
+## K3
+The K3 cipher is a 337-character-long text. It was encoded using a Transposition cipher. Meaning the order of the letters was rearranged but not replaced by a encoded letter as done in the Substitution ciphers.
+
 ## K4
 The K4 cipher is a 97-character-long text. Clues to K4 have been given by the creator of the sculpture. Entering the clues into the cipher gives the following results, where '.' represents the target for solving and '-' represents the part of the solved K3.
 - EAST
